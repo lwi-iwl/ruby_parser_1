@@ -2,26 +2,22 @@ require 'mechanize'
 require 'json'
 require 'ox'
 
-
 class HrmosParser
   def generate_xml(path)
     doc = Ox::Document.new(:version => '1.0')
-
     jobs = get_jobs
     jobs_count = jobs.nodes.count
-
     source = Ox::Element.new('source')
     source << (Ox::Element.new('jobs_count') << jobs_count.to_s)
     source << (Ox::Element.new('generation_time') << Time.now.utc.strftime('%m/%d/%Y %H:%M %p'))
     source << jobs
-
     doc << source
     xml = Ox.dump(doc)
-    File.write(path+'//file.xml', xml, mode: 'w')
+    File.write(path + '//file.xml', xml, mode: 'w')
   end
 
-
   private
+
   def get_jobs
     jobs = Ox::Element.new('jobs')
     @mechanize = Mechanize.new
@@ -47,18 +43,18 @@ class HrmosParser
     json = JSON.parse(node)
     full_address = json["jobLocation"].last["address"]
     Hash[
-      title:                json["title"],
-      url:                  link,
-      job_reference:        link.split('/')[-1],
-      street:               full_address["streetAddress"],
-      city:                 full_address["addressLocality"],
-      state:                full_address["addressRegion"],
-      location:             full_address["streetAddress"] + ', ' +
-                            full_address["addressLocality"]+ ', ' +
-                            full_address["addressRegion"],
-      body:                 json["description"],
-      company:              json["hiringOrganization"]["name"],
-      posted_at:            json["datePosted"]
+      title: json["title"],
+      url: link,
+      job_reference: link.split('/')[-1],
+      street: full_address["streetAddress"],
+      city: full_address["addressLocality"],
+      state: full_address["addressRegion"],
+      location: full_address["streetAddress"] + ', ' +
+        full_address["addressLocality"] + ', ' +
+        full_address["addressRegion"],
+      body: json["description"],
+      company: json["hiringOrganization"]["name"],
+      posted_at: json["datePosted"]
     ]
   end
 
