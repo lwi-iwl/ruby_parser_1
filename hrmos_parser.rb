@@ -3,6 +3,8 @@ require 'json'
 require 'ox'
 
 class HrmosParser
+  SITE_URL = 'https://hrmos.co/pages/zimmerbiomet/jobs'
+
   def generate_xml(path)
     doc = Ox::Document.new(:version => '1.0')
     jobs = get_jobs
@@ -21,7 +23,7 @@ class HrmosParser
   def get_jobs
     jobs = Ox::Element.new('jobs')
     @mechanize = Mechanize.new
-    get_links('https://hrmos.co/pages/zimmerbiomet/jobs').each do |link|
+    get_links(SITE_URL).each do |link|
       jobs << get_job(link)
     end
     jobs
